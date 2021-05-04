@@ -1,0 +1,20 @@
+{
+  "considerIp": false,
+  "wifiAccessPoints": [
+    {"macAddress":"02:11:32:68:43:A2","signalStrength":-64,"channel":8},
+    {"macAddress":"00:11:32:68:43:A2","signalStrength":-65,"channel":8},
+    {"macAddress":"48:4A:E9:2B:7D:82","signalStrength":-68,"channel":1},
+    {"macAddress":"48:4A:E9:2B:7D:80","signalStrength":-68,"channel":1},
+    {"macAddress":"54:BE:F7:E4:35:B0","signalStrength":-70,"channel":6},
+    {"macAddress":"8C:0F:6F:8A:68:F8","signalStrength":-79,"channel":1},
+    {"macAddress":"8C:0F:6F:2F:DB:B0","signalStrength":-79,"channel":1},
+    {"macAddress":"66:EB:8C:00:09:DF","signalStrength":-84,"channel":1},
+    {"macAddress":"7C:2E:BD:9B:A7:AE","signalStrength":-85,"channel":1},
+    {"macAddress":"00:0D:67:0D:F9:15","signalStrength":-85,"channel":1},
+    {"macAddress":"00:0D:67:0D:F9:14","signalStrength":-86,"channel":1},
+    {"macAddress":"D4:5D:DF:5C:47:98","signalStrength":-86,"channel":1},
+    {"macAddress":"DC:EB:69:FC:70:13","signalStrength":-86,"channel":1},
+    {"macAddress":"E4:F0:42:DB:42:B9","signalStrength":-86,"channel":6},
+    {"macAddress":"3C:37:86:D0:A3:88","signalStrength":-87,"channel":3}
+  ]
+}
