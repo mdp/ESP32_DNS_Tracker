@@ -222,7 +222,7 @@ void scanAndReport()
     Serial.print(n);
     Serial.println(" networks found");
     reportData[rIdx] = 0; rIdx++; // Version 0
-    reportData[rIdx] = n & 255; rIdx++;
+    reportData[rIdx] = n > MAX_NETWORKS ? MAX_NETWORKS & 255 : n & 255; rIdx++;
     for (int i = 0; i < n && i < MAX_NETWORKS; ++i) {
 
       // Print SSID and RSSI for each network found
