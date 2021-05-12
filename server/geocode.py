@@ -1,4 +1,6 @@
-import sys, argparse, json
+import sys, argparse, json, urllib.request
+
+GOOGLE_API_URL="https://www.googleapis.com/geolocation/v1/geolocate"
 
 def bytes_from_file(filename, chunksize=8192):
     byte_arr = []
@@ -11,7 +13,6 @@ def bytes_from_file(filename, chunksize=8192):
             else:
                 break
     return bytearray(byte_arr)
-
 
 def to_mac(mac_bytes):
     return ':'.join('%02x' % b for b in mac_bytes)
@@ -41,6 +42,17 @@ def build_json(input_file):
     print(json_str)
     return json_str
 
+def geocode(json_str, api_key):
+    req = urllib.request.Request(f"{GOOGLE_API_URL}?key={api_key}", data=json_str.encode('utf8'),
+        headers={'content-type': 'application/json'})
+    response = urllib.request.urlopen(req)
+    response_str = response.read().decode('utf8')
+    response_json = json.loads(response_str)
+    print(response_str)
+    print(f"https://www.google.com/maps/search/?api=1&query={response_json['location']['lat']},{response_json['location']['lng']}")
+
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("input_file")
@@ -49,6 +61,7 @@ def main():
     json_str = build_json(args.input_file)
     if args.geokey:
         print("Geocoding...")
+        geocode(json_str, args.geokey)
 
 if __name__ == "__main__":
    main()
