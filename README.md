@@ -12,7 +12,7 @@ DNS tunneling works because even in the case of a restricted internet portal, th
 
 The format we use is as follows:
 
-[Version 1][Index 1][UniqueID 13][Message ...].domainwecontrol.com
+`[Version 1][Index 1][UniqueID 13][Message ...].domainwecontrol.com`
 
 The index quint (A single base32 character) allow for up to 32 messages to be split apart and reasssembled on the server side and preserves ordering.
 
