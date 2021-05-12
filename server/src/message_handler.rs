@@ -41,7 +41,7 @@ impl MessageChunk {
         let raw_message = domain_rg.replace(raw_question, "");
         let raw_message = period_rg.replace_all(raw_message.borrow(), "").to_ascii_uppercase();
 
-        if raw_message.len() < 15 {
+        if raw_message.len() < 16 {
             return Err("Invalid Message: too short".into())
         }
 
