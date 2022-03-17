@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/mdp/ESP32_DNS_Tracker/actions/workflows/test.yaml/badge.svg)](https://github.com/mdp/ESP32_DNS_Tracker/actions)
 
-![esp32](https://user-images.githubusercontent.com/2868/158855018-771995a0-7232-4620-aa20-ea5a8a1eca71.png)
+![esp32](https://user-images.githubusercontent.com/2868/158855917-3c799cc4-de04-4dae-b6f7-561b139d1c90.png)
 
 **Goal: POC to track a esp32 device without a cellular connection or GPS receiver, using "open" wifi access points, DNS tunnelling and geocoding scanned WiFi MAC addresses.**
 
