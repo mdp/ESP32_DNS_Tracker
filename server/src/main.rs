@@ -37,7 +37,7 @@ fn get_checksum(val: &[u8]) -> u8 {
 fn add_inbound_query(message_buffer_cache: &mut MessageBufferCache,  name: &str, domain: &str) -> Result<MessageResult> {
     println!("Received query: {:?}", name);
     let message_chunk = MessageChunk::from(name, domain)?;
-    let id = message_chunk.id.to_string();
+    let id = message_chunk.id();
     match message_buffer_cache.add(message_chunk) {
         Ok(is_complete) => {
             Ok(MessageResult{id, is_complete})

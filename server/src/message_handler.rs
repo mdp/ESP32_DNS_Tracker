@@ -26,9 +26,8 @@ fn checksum(header: &str) -> bool {
 
 #[derive(Debug)]
 pub struct MessageChunk {
-    pub id: String,
+    pub source: String,
     pub idx: u8,
-    pub content: String,
     pub version: char,
     pub last: bool,
 }
@@ -39,41 +38,47 @@ impl MessageChunk {
         let domain_rg = Regex::new(&format!("{}$", domain))?;
         let period_rg = Regex::new(r"\.+")?;
         let raw_message = domain_rg.replace(raw_question, "");
-        let raw_message = period_rg.replace_all(raw_message.borrow(), "").to_ascii_uppercase();
+        let source = period_rg.replace_all(raw_message.borrow(), "").to_ascii_uppercase();
 
-        if raw_message.len() < 16 {
+        if source.len() < 16 {
             return Err("Invalid Message: too short".into())
         }
 
-        let version = raw_message[0..1].chars().next().unwrap();
+        let version = source[0..1].chars().next().unwrap();
         if !(version == 'A' || version == 'B') {
             return Err("Not a valid message".into())
         }
 
-        let idx_byte = raw_message[1..2].chars().next().unwrap() as usize;
+        let idx_byte = source[1..2].chars().next().unwrap() as usize;
         let idx: u8 = RFC4648_ALPHABET.iter().position(|c| idx_byte == *c as usize)
             .ok_or("Unable to decode index")?
             .try_into().unwrap();
 
-        let id = raw_message[2..15].to_string();
-        if !checksum(&raw_message[0..16]) {
+        if !checksum(&source[0..16]) {
             return Err("Not a valid message".into())
         }
 
-        let content = raw_message[16..].to_string();
         let mut last = false;
         if version == 'B' {
             last = true;
         }
 
         Ok(MessageChunk {
-            id,
+            source,
             idx,
             last,
             version,
-            content,
         })
     }
+
+    pub fn id(&self) -> String {
+        self.source[2..15].to_string()
+    }
+
+    pub fn content(&self) -> String {
+        self.source[16..].to_string()
+    }
+
 }
 
 #[derive(Debug)]
@@ -110,7 +115,7 @@ impl MessageBuffer {
         let mut content = String::new();
         for key in keys {
             let val = self.message_parts.get(&key).unwrap();
-            content.push_str(&val.content);
+            content.push_str(&val.content());
         }
         content
     }
@@ -135,7 +140,7 @@ impl MessageBufferCache {
     }
 
     pub fn add(&mut self, message_chunk: MessageChunk) -> Result<bool> {
-        let message_id = message_chunk.id.clone();
+        let message_id = message_chunk.id();
         let message_buffer = self.message_buffers.entry(message_id.clone()).
             or_insert_with(MessageBuffer::new);
         let is_complete = message_buffer.insert(message_chunk);
