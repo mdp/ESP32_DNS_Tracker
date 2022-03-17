@@ -29,7 +29,7 @@ fn get_unix_epoch_bytes() -> [u8; 8] {
 fn get_checksum(val: &[u8]) -> u8 {
     let mut c: u32 = 0; 
     for i in val.iter() {
-        c = c ^ *i as u32;
+        c ^= *i as u32;
     }
     (c % 255) as u8
 }
@@ -37,7 +37,7 @@ fn get_checksum(val: &[u8]) -> u8 {
 fn add_inbound_query(message_buffer_cache: &mut MessageBufferCache,  name: &str, domain: &str) -> Result<MessageResult> {
     println!("Received query: {:?}", name);
     let message_chunk = MessageChunk::from(name, domain)?;
-    let id = message_chunk.id.clone();
+    let id = message_chunk.id.to_string();
     match message_buffer_cache.add(message_chunk) {
         Ok(is_complete) => {
             Ok(MessageResult{id, is_complete})
@@ -71,7 +71,7 @@ fn handle_completed_message(msg: Vec<u8>, output_dir: &str, id: &str) -> Result<
         }
     }
 
-    return Ok(())
+    Ok(())
 }
 
 
@@ -102,7 +102,7 @@ fn handle_query(socket: &UdpSocket, message_buffer_cache: &mut MessageBufferCach
 
     let question = request.questions.pop();
 
-    let mut result: Result<MessageResult> = Err(format!("Nothing in dns query found to process").into());
+    let mut result: Result<MessageResult> = Err("Nothing in dns query found to process".to_string().into());
     if let Some(question) = question {
 
         result = add_inbound_query(message_buffer_cache, &question.name, domain);
@@ -168,7 +168,7 @@ fn main() -> Result<()> {
 
     // For now, queries are handled sequentially, so an infinite loop for servicing
     // requests is initiated.
-    let mut message_buffer_cache = MessageBufferCache::new(64);
+    let mut message_buffer_cache: MessageBufferCache = MessageBufferCache::new(64);
     loop {
         match handle_query(&socket, &mut message_buffer_cache, domain) {
             Ok(message_result) => {

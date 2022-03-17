@@ -15,13 +15,13 @@ fn checksum(header: &str) -> bool {
     let mut check: usize = 0;
     for h in header.chars() {
         match RFC4648_ALPHABET.iter().position(|c| h == *c as char) {
-            Some(i) => { check = check ^ i; }
+            Some(i) => { check ^= i; }
             None => { return false; }
         }
     }
     println!("check {:?}", check);
     if check == 0 { return true }
-    return false
+    false
 }
 
 #[derive(Debug)]
@@ -80,7 +80,6 @@ impl MessageChunk {
 pub struct MessageBuffer {
     message_parts: HashMap<u8, MessageChunk>,
     message_parts_total_len: u8,
-    complete: bool,
 }
 
 impl MessageBuffer {
@@ -89,11 +88,10 @@ impl MessageBuffer {
         MessageBuffer {
             message_parts: HashMap::new(),
             message_parts_total_len: 0,
-            complete: false,
         }
     }
 
-    pub fn insert(self: &mut Self, message_chunk: MessageChunk) -> bool {
+    pub fn insert(&mut self, message_chunk: MessageChunk) -> bool {
         let idx = message_chunk.idx;
         if message_chunk.last {
             self.message_parts_total_len = idx + 1;
@@ -102,13 +100,13 @@ impl MessageBuffer {
         self.is_complete()
     }
 
-    pub fn is_complete(self: &Self) -> bool {
+    pub fn is_complete(&self) -> bool {
         self.message_parts_total_len as usize == self.message_parts.len()
     }
 
-    pub fn get_message(self: &Self) -> String {
+    pub fn get_message(&self) -> String {
         let mut keys = self.message_parts.keys().copied().collect::<Vec<u8>>();
-        keys.sort();
+        keys.sort_unstable();
         let mut content = String::new();
         for key in keys {
             let val = self.message_parts.get(&key).unwrap();
@@ -136,16 +134,13 @@ impl MessageBufferCache {
         }
     }
 
-    pub fn add(self: &mut Self, message_chunk: MessageChunk) -> Result<bool> {
+    pub fn add(&mut self, message_chunk: MessageChunk) -> Result<bool> {
         let message_id = message_chunk.id.clone();
         let message_buffer = self.message_buffers.entry(message_id.clone()).
-            or_insert(MessageBuffer::new());
+            or_insert_with(MessageBuffer::new);
         let is_complete = message_buffer.insert(message_chunk);
-        match self.buffer_list.iter().find(|&id| id == &message_id) {
-            None => {
-                self.buffer_list.push_front(message_id);
-            },
-            _ => (),
+        if self.buffer_list.iter().find(|&id| id == &message_id) == None {
+            self.buffer_list.push_front(message_id);
         };
 
         // TODO: More efficient LRU like pattern. Works for now
@@ -156,7 +151,7 @@ impl MessageBufferCache {
         Ok(is_complete)
     }
     
-    pub fn get_value(self: &Self, key: &str) -> Option<Vec<u8>> {
+    pub fn get_value(&self, key: &str) -> Option<Vec<u8>> {
         match self.message_buffers.get(key) {
             Some(val) => base32::decode(base32::Alphabet::RFC4648 { padding: false }, val.get_message().as_str()),
             None => None,
@@ -178,7 +173,7 @@ mod tests {
         message_buffer_cache.add(MessageChunk::from("AA33333333333333FOO.foo.co", "foo.co").unwrap()).unwrap();
         message_buffer_cache.add(MessageChunk::from("AA44444444444444Foo.foo.co", "foo.co").unwrap()).unwrap();
         assert!(message_buffer_cache.message_buffers.len() == 3);
-        assert!(message_buffer_cache.message_buffers.contains_key("AAAAAAAAAAAAA") == false);
+        assert!(!message_buffer_cache.message_buffers.contains_key("AAAAAAAAAAAAA"));
         assert!(message_buffer_cache.message_buffers.contains_key("2222222222222"));
     }
 
