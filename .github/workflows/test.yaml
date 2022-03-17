@@ -4,6 +4,9 @@ name: CI
 
 jobs:
   build_and_test:
+    defaults:
+      run:
+        working-directory: server
     name: Rust project
     runs-on: ubuntu-latest
     steps:
@@ -11,11 +14,5 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - uses: actions-rs/cargo@v1
-        working-directory: ./server
-        with:
-          command: clippy
-      - uses: actions-rs/cargo@v1
-        working-directory: ./server
-        with:
-          command: build
+      - run: cargo clippy
+      - run: cargo build

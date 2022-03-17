@@ -1,6 +1,10 @@
-# ESP32 DNS Location Tracker
+# ESP32 DNS Location Tracker 
 
-Goal: To track a esp32 device without a cellular connection or GPS receiver, using "open" wifi access points, DNS tunnelling and geocoding scanned WiFi MAC addresses.
+[![Tests](https://github.com/mdp/ESP32_DNS_Tracker/actions/workflows/test.yaml/badge.svg)](https://github.com/mdp/ESP32_DNS_Tracker/actions)
+
+![esp32](https://user-images.githubusercontent.com/2868/158855018-771995a0-7232-4620-aa20-ea5a8a1eca71.png)
+
+**Goal: POC to track a esp32 device without a cellular connection or GPS receiver, using "open" wifi access points, DNS tunnelling and geocoding scanned WiFi MAC addresses.**
 
 ## How it works
 
@@ -18,7 +22,7 @@ The index quint (A single base32 character) allow for up to 32 messages to be sp
 
 ## The Code
 
-This project breaks it's code up into two parts, the Arduino code for the ESP32 and a DNS server writter in Rust. It's very experimental and not designed for any serious use. It should be viewed more as a proof of concept.
+This project breaks it's code up into two parts, the Arduino code for the ESP32 and a DNS server writter in Rust. It's very experimental and not designed for any serious use. It should be viewed for what it is, a proof of concept.
 
 ## See it in action
 
