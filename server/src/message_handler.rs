@@ -169,43 +169,46 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_ring_hash() {
+    fn test_ring_hash() -> Result<()> {
         let mut message_buffer_cache = MessageBufferCache::new(3);
         
-        message_buffer_cache.add(MessageChunk::from("AAAAAAAAAAAAAAAAPMRGM33PEI5.foo.co", "foo.co").unwrap()).unwrap();
-        message_buffer_cache.add(MessageChunk::from("BBAAAAAAAAAAAAAACEYTBOIRH2.foo.co", "foo.co").unwrap()).unwrap();
-        message_buffer_cache.add(MessageChunk::from("AA22222222222222FOO.foo.co", "foo.co").unwrap()).unwrap();
-        message_buffer_cache.add(MessageChunk::from("AA33333333333333FOO.foo.co", "foo.co").unwrap()).unwrap();
-        message_buffer_cache.add(MessageChunk::from("AA44444444444444Foo.foo.co", "foo.co").unwrap()).unwrap();
+        message_buffer_cache.add(MessageChunk::from("AAAAAAAAAAAAAAAAPMRGM33PEI5.foo.co", "foo.co")?)?;
+        message_buffer_cache.add(MessageChunk::from("BBAAAAAAAAAAAAAACEYTBOIRH2.foo.co", "foo.co")?)?;
+        message_buffer_cache.add(MessageChunk::from("AA22222222222222FOO.foo.co", "foo.co")?)?;
+        message_buffer_cache.add(MessageChunk::from("AA33333333333333FOO.foo.co", "foo.co")?)?;
+        message_buffer_cache.add(MessageChunk::from("AA44444444444444Foo.foo.co", "foo.co")?)?;
         assert!(message_buffer_cache.message_buffers.len() == 3);
         assert!(!message_buffer_cache.message_buffers.contains_key("AAAAAAAAAAAAA"));
         assert!(message_buffer_cache.message_buffers.contains_key("2222222222222"));
+        Ok(())
     }
 
     #[test]
-    fn test_message_building() {
+    fn test_message_building() -> Result<()> {
         let mut message_buffer_cache = MessageBufferCache::new(3);
-        message_buffer_cache.add(MessageChunk::from("AADDDDDDDDDDDDDDPMRGM33PEI5.foo.co", "foo.co").unwrap()).unwrap();
-        let is_complete = message_buffer_cache.add(MessageChunk::from("BBDDDDDDDDDDDDDDCEYTBOIRH2.foo.co", "foo.co").unwrap()).unwrap();
+        message_buffer_cache.add(MessageChunk::from("AADDDDDDDDDDDDDDPMRGM33PEI5.foo.co", "foo.co")?)?;
+        let is_complete = message_buffer_cache.add(MessageChunk::from("BBDDDDDDDDDDDDDDCEYTBOIRH2.foo.co", "foo.co")?)?;
         assert!(is_complete);
         let byte_message = message_buffer_cache.get_value("DDDDDDDDDDDDD").unwrap();
         let message = String::from_utf8(byte_message).unwrap();
         assert_eq!(message, String::from("{\"foo\":\"bar\"}"));
+        Ok(())
     }
 
     #[test]
-    fn test_message_dupes() {
+    fn test_message_dupes() -> Result<()> {
         // Should happily handle multiple duplicate messages an in any order (UDP constrain)
         let mut message_buffer_cache = MessageBufferCache::new(3);
-        let mut is_complete =message_buffer_cache.add(MessageChunk::from("AAZ222222222222ZPMRGM33PEI5.foo.co", "foo.co").unwrap()).unwrap();
+        let mut is_complete =message_buffer_cache.add(MessageChunk::from("AAZ222222222222ZPMRGM33PEI5.foo.co", "foo.co")?)?;
         assert!(!is_complete);
-        is_complete = message_buffer_cache.add(MessageChunk::from("BBZ222222222222ZCEYTBOIRH2.foo.co", "foo.co").unwrap()).unwrap();
+        is_complete = message_buffer_cache.add(MessageChunk::from("BBZ222222222222ZCEYTBOIRH2.foo.co", "foo.co")?)?;
         assert!(is_complete);
-        is_complete = message_buffer_cache.add(MessageChunk::from("BBZ222222222222ZCEYTBOIRH2.foo.co", "foo.co").unwrap()).unwrap();
+        is_complete = message_buffer_cache.add(MessageChunk::from("BBZ222222222222ZCEYTBOIRH2.foo.co", "foo.co")?)?;
         assert!(is_complete);
         let byte_message = message_buffer_cache.get_value("Z222222222222").unwrap();
-        let message = String::from_utf8(byte_message).unwrap();
+        let message = String::from_utf8(byte_message)?;
         assert_eq!(message, String::from("{\"foo\":\"bar\"}"));
+        Ok(())
     }
 
 }
